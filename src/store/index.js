@@ -119,12 +119,19 @@ export default createStore({
   actions: {
 
     loadContentById: async ({ getters, dispatch }, id) => {
-      try {
-        const d = await getDoc(doc(db, 'contentv2', id))
-        const contentData = JSON.parse(d.data().src)
-        dispatch('addToLocalContent', { id, data: contentData })
-      } catch (e) {
-        console.warn('Error in loadContentById', e)
+      const state = await Agent.state(id)
+      if (Object.keys(state).length) {
+        dispatch('addToLocalContent', { id, data: JSON.parse(JSON.stringify(state)) })
+      }
+      else {
+        //  fallback to old firebase storage
+        try {
+          const d = await getDoc(doc(db, 'contentv2', id))
+          const contentData = JSON.parse(d.data().src)
+          dispatch('addToLocalContent', { id, data: contentData })
+        } catch (e) {
+          console.warn('Error in loadContentById', e)
+        }
       }
     },
 
@@ -169,6 +176,12 @@ export default createStore({
     },
     addToLocalContent: ({ commit }, payload) => commit('addToLocalContent', payload),
     saveToFirestore: async (_context, {id, data}) => {
+      Agent
+        .state(id)
+        .then( state => {
+          Object.keys(state).forEach(key => delete state[key])
+          Object.assign(state, JSON.parse(JSON.stringify(data)))
+        })
       try {
         const jsonData = JSON.stringify(data)
         const docRef = doc(db, 'contentv2', id)
