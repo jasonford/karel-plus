@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@knowlearning/agents": "^0.9.173",
     "@vitejs/plugin-basic-ssl": "^1.0.1",
     "blockly": "^5.20210325.1",
     "core-js": "^3.32.2",

@@ -3,7 +3,10 @@
     v-if="loaded"
     style="height: 100%;"
   >
-    <TaskPlayer :id="id" />
+    <TaskPlayer
+      :id="id"
+      @taskCorrect="onTaskCorrect"
+    />
   </div>
   <div v-else>
     loading...
@@ -32,9 +35,10 @@ export default {
       loaded: false
     }
   },
-  computed: {
-  },
   methods: {
+    onTaskCorrect() {
+      Agent.close({ success: true })
+    }
   }
 }
 </script>
