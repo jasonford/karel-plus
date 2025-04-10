@@ -117,6 +117,17 @@ export default createStore({
     }
   },
   actions: {
+
+    loadContentById: async ({ getters, dispatch }, id) => {
+      try {
+        const d = await getDoc(doc(db, 'contentv2', id))
+        const contentData = JSON.parse(d.data().src)
+        dispatch('addToLocalContent', { id, data: contentData })
+      } catch (e) {
+        console.warn('Error in loadContentById', e)
+      }
+    },
+
     setLoading: ({ commit }, bool) => commit('setLoading', bool),
 
     loadContent: async ({ getters, dispatch }) => {
@@ -146,7 +157,7 @@ export default createStore({
       }
 
     },
-    
+
     addToExpertIds: ({ commit }, id) => commit('addToExpertIds', id),
     save: async ({ commit, dispatch, getters }, { swapId, type })  => {
       const newId = uuid()
